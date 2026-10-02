@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Master - Primary 3 Math</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font - Inter & Outfit for friendly UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#6C5CE7',
+                            lightBg: '#F4F1FE',
+                            pink: '#FD79A8',
+                            blue: '#0984E3',
+                            green: '#00B894',
+                            yellow: '#FDCB6E',
+                            card: '#FFFFFF'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #F4F1FE;
+            background-image: radial-gradient(#dcd6f7 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        .timeline-container {
+            position: relative;
+            overflow-x: auto;
+            padding: 20px 10px;
+        }
+
+        /* SVG Arc styling */
+        .jump-arc {
+            fill: none;
+            stroke-width: 3;
+            stroke-dasharray: 6 3;
+            animation: dash 30s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+
+        .input-box {
+            transition: all 0.2s ease;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .input-box:focus {
+            transform: scale(1.05);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.4);
+        }
+
+        .input-correct {
+            background-color: #D1FAE5 !important;
+            border-color: #10B981 !important;
+            color: #065F46 !important;
+        }
+
+        .input-wrong {
+            background-color: #FEE2E2 !important;
+            border-color: #EF4444 !important;
+            color: #991B1B !important;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-white/90 backdrop-blur border-b border-indigo-100 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-xl shadow-md shadow-indigo-200">
+                    <i class="fa-solid font-bold fa-clock"></i>
+                </div>
+                <div>
+                    <h1 class="font-display text-xl sm:text-2xl font-bold text-indigo-950 leading-none">Time Master</h1>
+                    <p class="text-xs text-indigo-500 font-medium hidden sm:block">Primary 3 Mathematics Practice</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="flex items-center space-x-3 sm:space-x-6">
+                <div class="flex items-center bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
+                    <i class="fa-solid fa-star text-amber-500 text-lg mr-1.5"></i>
+                    <span id="star-count" class="font-display font-bold text-amber-800 text-lg">0</span>
+                </div>
+                <div class="flex items-center bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
+                    <i class="fa-solid fa-fire text-emerald-500 text-lg mr-1.5"></i>
+                    <span id="streak-count" class="font-display font-bold text-emerald-800 text-lg">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- Level Selector Tabs -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+            <button onclick="switchLevel(1)" id="tab-lvl-1" class="tab-btn px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-200 flex flex-col items-center justify-center border-2 border-indigo-600 bg-indigo-600 text-white shadow-lg shadow-indigo-200">
+                <div class="flex items-center space-x-1">
+                    <i class="fa-solid fa-right-left"></i>
+                    <span>Level 1</span>
+                </div>
+                <span class="text-xs font-sans font-normal opacity-90 mt-0.5">Time Conversions</span>
+            </button>
+
+            <button onclick="switchLevel(2)" id="tab-lvl-2" class="tab-btn px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-200 flex flex-col items-center justify-center border-2 border-slate-200 bg-white text-slate-600 hover:border-indigo-300">
+                <div class="flex items-center space-x-1">
+                    <i class="fa-solid fa-arrow-right font-bold text-emerald-500"></i>
+                    <span>Level 2</span>
+                </div>
+                <span class="text-xs font-sans font-normal text-slate-500 mt-0.5">Timeline Forward</span>
+            </button>
+
+            <button onclick="switchLevel(3)" id="tab-lvl-3" class="tab-btn px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-200 flex flex-col items-center justify-center border-2 border-slate-200 bg-white text-slate-600 hover:border-indigo-300">
+                <div class="flex items-center space-x-1">
+                    <i class="fa-solid fa-arrow-left font-bold text-rose-500"></i>
+                    <span>Level 3</span>
+                </div>
+                <span class="text-xs font-sans font-normal text-slate-500 mt-0.5">Timeline Backward</span>
+            </button>
+
+            <button onclick="switchLevel(4)" id="tab-lvl-4" class="tab-btn px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-200 flex flex-col items-center justify-center border-2 border-slate-200 bg-white text-slate-600 hover:border-indigo-300">
+                <div class="flex items-center space-x-1">
+                    <i class="fa-solid fa-sliders text-amber-500"></i>
+                    <span>Sandbox</span>
+                </div>
+                <span class="text-xs font-sans font-normal text-slate-500 mt-0.5">Interactive Timeline</span>
+            </button>
+        </div>
+
+        <!-- Question Card Outer Container -->
+        <div id="game-card" class="bg-white rounded-3xl p-5 sm:p-8 shadow-xl shadow-indigo-100 border border-indigo-50 relative overflow-hidden">
+            
+            <!-- Mode Header Info -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <span id="level-badge" class="badge-pill bg-indigo-100 text-indigo-700 text-sm">
+                        Level 1: Conversions
+                    </span>
+                    <span id="sub-mode-badge" class="badge-pill bg-slate-100 text-slate-700 text-xs sm:text-sm">
+                        12-h & 24-h Clock
+                    </span>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <button onclick="showHint()" class="px-3 py-1.5 rounded-xl bg-amber-100 text-amber-800 hover:bg-amber-200 text-xs sm:text-sm font-semibold transition flex items-center space-x-1">
+                        <i class="fa-regular fa-lightbulb text-amber-600"></i>
+                        <span>Hint</span>
+                    </button>
+                    <button onclick="generateQuestion()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition flex items-center space-x-1">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>New Question</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Instruction Prompt -->
+            <div id="question-prompt-box" class="mb-6 bg-indigo-50/70 border border-indigo-100 rounded-2xl p-4">
+                <h2 id="question-prompt" class="font-display text-lg sm:text-xl font-bold text-indigo-950">
+                    Fill in the missing values.
+                </h2>
+                <p id="question-subtext" class="text-sm text-indigo-800/80 mt-1">
+                    Convert between 12-hour clock and 24-hour clock formats.
+                </p>
+            </div>
+
+            <!-- Dynamic Interactive Workspace -->
+            <div id="workspace" class="min-h-[260px] flex flex-col justify-center my-4">
+                <!-- Content injected dynamically via JavaScript -->
+            </div>
+
+            <!-- Feedback & Submit Control Bar -->
+            <div class="mt-8 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div id="feedback-msg" class="text-center sm:text-left min-h-[28px] font-semibold text-base">
+                    <!-- Dynamic feedback messages show here -->
+                </div>
+
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <button id="check-btn" onclick="checkAnswer()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold text-lg shadow-lg shadow-indigo-200 transition transform active:scale-95 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>Check Answers</span>
+                    </button>
+                    <button id="next-btn" onclick="generateQuestion()" class="hidden w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-display font-bold text-lg shadow-lg shadow-emerald-200 transition transform active:scale-95 flex items-center justify-center space-x-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Hint Modal / Drawer -->
+        <div id="hint-box" class="hidden mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-start space-x-3">
+            <i class="fa-solid fa-circle-info text-amber-600 text-lg mt-0.5"></i>
+            <div>
+                <h4 class="font-bold text-amber-900 mb-1">Helpful Reminder:</h4>
+                <div id="hint-text">12-hour to 24-hour: Add 12 hours for PM times (except 12:00 pm). For AM times, write 4 digits (e.g., 7:50 am = 07 50).</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-200 bg-white/50 mt-8">
+        Primary 3 Mathematics Interactive Learning App &bull; Singapore Syllabus standard
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Web Audio API Sound Effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration, delay = 0) {
+            setTimeout(() => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                } catch(e){}
+            }, delay);
+        }
+
+        function playCorrectSound() {
+            playTone(523.25, 'triangle', 0.15, 0);   // C5
+            playTone(659.25, 'triangle', 0.15, 100); // E5
+            playTone(783.99, 'triangle', 0.25, 200); // G5
+        }
+
+        function playWrongSound() {
+            playTone(220, 'sawtooth', 0.2, 0);
+            playTone(196, 'sawtooth', 0.3, 150);
+        }
+
+        // Global Game State
+        let currentLevel = 1;
+        let currentSubMode = 'clock'; // Level 1 submodes: 'clock', 'hours_to_min', 'min_to_hours'
+        let stars = 0;
+        let streak = 0;
+        let currentData = null;
+
+        
+        // Helper: pad leading zeros
+        const pad = (num, size = 2) => String(num).padStart(size, '0');
+
+        // Random integer helper
+        const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+        // Convert mins to hours + mins string
+        function minsToHM(totalMins) {
+            const h = Math.floor(totalMins / 60);
+            const m = totalMins % 60;
+            return { h, m };
+        }
+
+        // Level 1 Generator
+        function generateLevel1Data() {
+            const subModes = ['clock', 'hours_to_min', 'min_to_hours'];
+            currentSubMode = subModes[randInt(0, subModes.length - 1)];
+
+            if (currentSubMode === 'clock') {
+                // Table conversions matching document 1
+                // Generate 4 randomized clock items
+                const sampleTimes = [
+                    { h: 7, m: 50, isPm: false },
+                    { h: 4, m: 5, isPm: true },
+                    { h: 8, m: 45, isPm: false },
+                    { h: 10, m: 50, isPm: true },
+                    { h: 12, m: 0, isPm: false },
+                    { h: 12, m: 30, isPm: true },
+                    { h: 1, m: 15, isPm: true },
+                    { h: 9, m: 20, isPm: false }
+                ];
+                
+                // pick 4 random distinct
+                const shuffled = [...sampleTimes].sort(() => 0.5 - Math.random()).slice(0, 4);
+
+                const rows = shuffled.map((t, idx) => {
+                    const h12 = t.h;
+                    const mStr = pad(t.m);
+                    const period = t.isPm ? 'pm' : 'am';
+                    const clock12Str = `${h12}:${mStr} ${period}`;
+                    
+                    let h24Num = t.h;
+                    if (t.isPm && t.h !== 12) h24Num += 12;
+                    if (!t.isPm && t.h === 12) h24Num = 0;
+                    
+                    const clock24Str = `${pad(h24Num)} ${mStr}`;
+
+                    // Hide one side (alternate or random)
+                    const hide24 = idx % 2 === 0;
+
+                    return {
+                        clock12: clock12Str,
+                        clock24: clock24Str,
+                        hide24: hide24
+                    };
+                });
+
+                return { type: 'clock_table', rows };
+
+            } else if (currentSubMode === 'hours_to_min') {
+                // e.g. 1 h 35 min = 1 h + 35 min = 60 min + 35 min = 95 min
+                const h = randInt(1, 3);
+                const m = randInt(5, 55);
+                const hInMins = h * 60;
+                const totalMins = hInMins + m;
+
+                return {
+                    type: 'hours_to_min',
+                    h,
+                    m,
+                    hInMins,
+                    totalMins
+                };
+            } else {
+                // e.g. 112 min = 60 min + 52 min = 1 h + 52 min = 1 h 52 min
+                const h = randInt(1, 2);
+                const m = randInt(10, 50);
+                const totalMins = h * 60 + m;
+                const hInMins = h * 60;
+
+                return {
+                    type: 'min_to_hours',
+                    totalMins,
+                    hInMins,
+                    remMins: m,
+                    h,
+                    m
+                };
+            }
+        }
+
+        // Level 2 Generator (Timeline Forward)
+        function generateLevel2Data() {
+            // Forward timeline: start time + duration jumps -> end time OR find total duration
+            const scenarios = [
+                { name: "Siti", action: "watching a show", startH: 4, startM: 15, isPm: true, jumpH: 1, jumpM: 45, target: "duration" },
+                { name: "Linda", action: "at the Night Safari", startH: 19, startM: 30, is24h: true, jumpH: 3, jumpM: 45, target: "duration" },
+                { name: "Ahmad", action: "studying at the library", startH: 10, startM: 20, isPm: false, jumpH: 2, jumpM: 15, target: "endtime" },
+                { name: "Mei Ling", action: "baking a cake", startH: 14, startM: 15, is24h: true, jumpH: 1, jumpM: 30, target: "endtime" }
+            ];
+
+            const sc = scenarios[randInt(0, scenarios.length - 1)];
+
+            // Calculate intermediate time after hour jump
+            let startTotal = sc.startH * 60 + sc.startM;
+            let midTotal = startTotal + sc.jumpH * 60;
+            let endTotal = midTotal + sc.jumpM;
+
+            // Break jumpM into 1 or 2 minute chunks for timeline breakdown
+            let jumpM1 = sc.jumpM;
+            let jumpM2 = 0;
+            if (sc.jumpM > 30) {
+                jumpM1 = 30;
+                jumpM2 = sc.jumpM - 30;
+            }
+
+            return {
+                scenario: sc,
+                startTotal,
+                midTotal,
+                endTotal,
+                jumpH: sc.jumpH,
+                jumpM: sc.jumpM,
+                jumpM1,
+                jumpM2,
+                is24h: sc.is24h || false,
+                target: sc.target
+            };
+        }
+
+        // Level 3 Generator (Timeline Backward)
+        function generateLevel3Data() {
+            // Backward timeline: given end time and duration, count backward to find start time
+            const scenarios = [
+                { name: "Linda", action: "at the theme park", endH: 23, endM: 15, is24h: true, jumpH: 3, jumpM: 45 },
+                { name: "Raj", action: "swimming lesson", endH: 5, endM: 30, isPm: true, jumpH: 1, jumpM: 45 },
+                { name: "John", action: "bus ride home", endH: 18, endM: 10, is24h: true, jumpH: 1, jumpM: 25 },
+                { name: "Siti", action: "piano practice", endH: 11, endM: 15, isPm: false, jumpH: 2, jumpM: 30 }
+            ];
+
+            const sc = scenarios[randInt(0, scenarios.length - 1)];
+
+            let endTotal = sc.endH * 60 + sc.endM;
+            let jumpTotal = sc.jumpH * 60 + sc.jumpM;
+            let startTotal = endTotal - jumpTotal;
+
+            // intermediate backward steps
+            let mid1Total = endTotal - sc.jumpH * 60; // stepped back hours
+            
+            let jumpM1 = sc.jumpM;
+            let jumpM2 = 0;
+            if (sc.jumpM > 30) {
+                jumpM1 = 30;
+                jumpM2 = sc.jumpM - 30;
+            }
+
+            return {
+                scenario: sc,
+                endTotal,
+                mid1Total,
+                startTotal,
+                jumpH: sc.jumpH,
+                jumpM: sc.jumpM,
+                jumpM1,
+                jumpM2,
+                is24h: sc.is24h || false
+            };
+        }
+
+        // Format total minutes into display string
+        function formatTimeDisplay(totalMins, is24h) {
+            totalMins = (totalMins + 1440) % 1440; // sanitize bounds
+            const h24 = Math.floor(totalMins / 60);
+            const m = totalMins % 60;
+
+            if (is24h) {
+                return `${pad(h24)} ${pad(m)}`;
+            } else {
+                let h12 = h24 % 12;
+                if (h12 === 0) h12 = 12;
+                const period = h24 >= 12 ? 'pm' : 'am';
+                return `${h12}:${pad(m)} ${period}`;
+            }
+        }
+
+
+        function renderLevel1(data) {
+            const workspace = document.getElementById('workspace');
+
+            if (data.type === 'clock_table') {
+                document.getElementById('question-prompt').innerText = "Find the missing time in 12-hour clock or 24-hour clock.";
+                document.getElementById('question-subtext').innerText = "Fill in the empty boxes below correctly.";
+
+                let html = `
+                    <div class="max-w-xl mx-auto w-full bg-purple-50/50 rounded-2xl p-4 sm:p-6 border border-purple-100 shadow-sm">
+                        <div class="grid grid-cols-2 gap-3 font-display font-bold text-center bg-purple-200 text-purple-900 py-3 px-4 rounded-xl mb-3 text-base sm:text-lg">
+                            <div>12-hour clock</div>
+                            <div>24-hour clock</div>
+                        </div>
+                        <div class="space-y-3">
+                `;
+
+                data.rows.forEach((row, i) => {
+                    html += `
+                        <div class="grid grid-cols-2 gap-3 items-center bg-white p-3 rounded-xl border border-purple-100 shadow-sm">
+                            <div class="text-center font-bold text-slate-700 text-base sm:text-lg">
+                                ${row.hide24 ? row.clock12 : `<input type="text" id="ans-l1-12-${i}" data-expected="${row.clock12}" placeholder="e.g. 7:50 am" class="input-box w-full max-w-[150px] px-3 py-2 border-2 border-indigo-200 rounded-xl bg-purple-50 text-indigo-900 text-center font-bold">`}
+                            </div>
+                            <div class="text-center font-bold text-slate-700 text-base sm:text-lg">
+                                ${!row.hide24 ? row.clock24 : `<input type="text" id="ans-l1-24-${i}" data-expected="${row.clock24}" placeholder="e.g. 07 50" class="input-box w-full max-w-[150px] px-3 py-2 border-2 border-indigo-200 rounded-xl bg-purple-50 text-indigo-900 text-center font-bold">`}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+                workspace.innerHTML = html;
+
+            } else if (data.type === 'hours_to_min') {
+                document.getElementById('question-prompt').innerText = `Convert ${data.h} h ${data.m} min to minutes.`;
+                document.getElementById('question-subtext').innerText = "Follow the Singapore Math step-by-step breakdown diagram.";
+
+                workspace.innerHTML = `
+                    <div class="max-w-2xl mx-auto w-full space-y-6">
+                        
+                        <!-- Mathematical breakdown steps -->
+                        <div class="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 space-y-4 font-display text-lg sm:text-xl font-semibold text-slate-800">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span>${data.h} h ${data.m} min</span>
+                                <span>=</span>
+                                <span>${data.h} h</span>
+                                <span>+</span>
+                                <input id="ans-h2m-1" data-expected="${data.m}" type="number" class="input-box w-20 px-2 py-1 border-2 border-indigo-300 rounded-xl text-center bg-white text-indigo-900">
+                                <span>min</span>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span>=</span>
+                                <input id="ans-h2m-2" data-expected="${data.hInMins}" type="number" class="input-box w-24 px-2 py-1 border-2 border-indigo-300 rounded-xl text-center bg-white text-indigo-900">
+                                <span>min</span>
+                                <span>+</span>
+                                <input id="ans-h2m-3" data-expected="${data.m}" type="number" class="input-box w-20 px-2 py-1 border-2 border-indigo-300 rounded-xl text-center bg-white text-indigo-900">
+                                <span>min</span>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2 text-indigo-900 font-bold">
+                                <span>=</span>
+                                <input id="ans-h2m-4" data-expected="${data.totalMins}" type="number" class="input-box w-28 px-3 py-1.5 border-2 border-indigo-500 rounded-xl text-center bg-indigo-100 text-indigo-900 text-xl">
+                                <span>min</span>
+                            </div>
+                        </div>
+
+                        <!-- Number Bond Diagram ( matching doc 1 ) -->
+                        <div class="bg-purple-50/60 p-5 rounded-2xl border border-purple-200">
+                            <p class="text-xs uppercase tracking-wider text-purple-700 font-bold mb-3 text-center">Number Decomposition Helper</p>
+                            <div class="flex items-center justify-center space-x-6 sm:space-x-12">
+                                <!-- Top bubble -->
+                                <div class="bg-purple-600 text-white font-bold text-lg px-4 py-2 rounded-2xl shadow-md">
+                                    ${data.h} h ${data.m} min
+                                </div>
+                            </div>
+                            
+                            <!-- Connecting arrows -->
+                            <div class="flex justify-center my-2 text-purple-400 text-2xl space-x-16">
+                                <i class="fa-solid fa-arrow-down-left"></i>
+                                <i class="fa-solid fa-arrow-down-right"></i>
+                            </div>
+
+                            <!-- Bottom Branch Bubbles -->
+                            <div class="flex justify-center space-x-8 sm:space-x-16">
+                                <div class="bg-white border-2 border-purple-300 p-3 rounded-2xl text-center">
+                                    <div class="font-bold text-slate-700">${data.h} h</div>
+                                    <div class="text-sm font-bold text-purple-700 mt-1">
+                                        (<input id="ans-h2m-bond1" data-expected="${data.hInMins}" type="number" class="input-box w-16 px-1 py-0.5 border border-purple-300 rounded text-center"> min)
+                                    </div>
+                                </div>
+
+                                <div class="bg-white border-2 border-purple-300 p-3 rounded-2xl text-center flex items-center justify-center">
+                                    <div class="text-sm font-bold text-purple-700">
+                                        <input id="ans-h2m-bond2" data-expected="${data.m}" type="number" class="input-box w-16 px-1 py-0.5 border border-purple-300 rounded text-center"> min
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            } else if (data.type === 'min_to_hours') {
+                document.getElementById('question-prompt').innerText = `Convert ${data.totalMins} min into hours and minutes.`;
+                document.getElementById('question-subtext').innerText = "Decompose total minutes into 60 min (1 h) increments.";
+
+                workspace.innerHTML = `
+                    <div class="max-w-2xl mx-auto w-full space-y-6">
+                        
+                        <!-- Mathematical breakdown steps -->
+                        <div class="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 space-y-4 font-display text-lg sm:text-xl font-semibold text-slate-800">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span>${data.totalMins} min</span>
+                                <span>=</span>
+                                <input id="ans-m2h-1" data-expected="${data.hInMins}" type="number" class="input-box w-24 px-2 py-1 border-2 border-indigo-300 rounded-xl text-center bg-white text-indigo-900">
+                                <span>min +</span>
+                                <input id="ans-m2h-2" data-expected="${data.remMins}" type="number" class="input-box w-20 px-2 py-1 border-2 border-indigo-300 rounded-xl text-center bg-white text-indigo-900">
+                                <span>min</span>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span>=</span>
+                                <input id="ans-m2h-3" data-expected="${data.h}" type="number" class="input-box w-16 px-2 py-1 border-2 border-indigo-300 rounded-xl text-center bg-white text-indigo-900">
+                                <span>h +</span>
+                                <input id="ans-m2h-4" data-expected="${data.remMins}" type="number" class="input-box w-20 px-2 py-1 border-2 border-indigo-300 rounded-xl text-center bg-white text-indigo-900">
+                                <span>min</span>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2 text-indigo-900 font-bold">
+                                <span>=</span>
+                                <input id="ans-m2h-5" data-expected="${data.h}" type="number" class="input-box w-16 px-2 py-1 border-2 border-indigo-500 rounded-xl text-center bg-indigo-100 text-indigo-900">
+                                <span>h</span>
+                                <input id="ans-m2h-6" data-expected="${data.remMins}" type="number" class="input-box w-20 px-2 py-1 border-2 border-indigo-500 rounded-xl text-center bg-indigo-100 text-indigo-900">
+                                <span>min</span>
+                            </div>
+                        </div>
+
+                        <!-- Number Bond Diagram -->
+                        <div class="bg-purple-50/60 p-5 rounded-2xl border border-purple-200">
+                            <p class="text-xs uppercase tracking-wider text-purple-700 font-bold mb-3 text-center">Decomposition Diagram</p>
+                            <div class="flex items-center justify-center">
+                                <div class="bg-purple-600 text-white font-bold text-lg px-6 py-2 rounded-2xl shadow-md">
+                                    ${data.totalMins} min
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-center my-2 text-purple-400 text-2xl space-x-16">
+                                <i class="fa-solid fa-arrow-down-left"></i>
+                                <i class="fa-solid fa-arrow-down-right"></i>
+                            </div>
+
+                            <div class="flex justify-center space-x-8 sm:space-x-16">
+                                <div class="bg-white border-2 border-purple-300 p-3 rounded-2xl text-center">
+                                    <div class="font-bold text-slate-700">
+                                        <input id="ans-m2h-bond1" data-expected="${data.hInMins}" type="number" class="input-box w-16 px-1 py-0.5 border border-purple-300 rounded text-center"> min
+                                    </div>
+                                    <div class="text-sm font-bold text-purple-700 mt-1">(${data.h} h)</div>
+                                </div>
+
+                                <div class="bg-white border-2 border-purple-300 p-3 rounded-2xl text-center flex items-center justify-center">
+                                    <div class="text-sm font-bold text-purple-700">
+                                        <input id="ans-m2h-bond2" data-expected="${data.remMins}" type="number" class="input-box w-16 px-1 py-0.5 border border-purple-300 rounded text-center"> min
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            }
+        }
+
+
+        function renderLevel2(data) {
+            const workspace = document.getElementById('workspace');
+            const sc = data.scenario;
+
+            const startTimeStr = formatTimeDisplay(data.startTotal, data.is24h);
+            const midTimeStr = formatTimeDisplay(data.midTotal, data.is24h);
+            const endTimeStr = formatTimeDisplay(data.endTotal, data.is24h);
+
+            document.getElementById('question-prompt').innerText = `${sc.name} started ${sc.action} at ${startTimeStr}.`;
+            if (sc.target === 'duration') {
+                document.getElementById('question-prompt').innerText += ` The activity ended at ${endTimeStr}. How long was the duration?`;
+            } else {
+                document.getElementById('question-prompt').innerText += ` The activity lasted for ${data.jumpH} h ${data.jumpM} min. What time did it end?`;
+            }
+            document.getElementById('question-subtext').innerText = "Use the timeline below by filling in the jump durations (top) and timestamps (bottom).";
+
+            let html = `
+                <div class="w-full space-y-6">
+                    
+                    <!-- SVG Interactive Timeline Component -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-6 border-2 border-slate-200 shadow-inner overflow-x-auto">
+                        <div class="min-w-[550px] relative py-8">
+                            
+                            <!-- Timeline Arcs Container -->
+                            <div class="flex items-center justify-between relative z-10 px-6">
+                                
+                                <!-- Jump 1: Hours -->
+                                <div class="flex-1 text-center relative px-2">
+                                    <div class="mb-2">
+                                        <span class="inline-flex items-center space-x-1 bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
+                                            <input id="ans-l2-jumph" data-expected="${data.jumpH}" type="number" class="input-box w-12 px-1 py-0.5 bg-white border border-amber-300 rounded text-center text-sm">
+                                            <span>h</span>
+                                        </span>
+                                    </div>
+                                    <!-- Curved Arc SVG -->
+                                    <svg class="w-full h-12" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                        <path d="M 5,35 Q 50,5 95,35" fill="none" stroke="#F59E0B" stroke-width="3" stroke-dasharray="4,4"/>
+                                        <polygon points="90,30 98,35 92,38" fill="#F59E0B" />
+                                    </svg>
+                                </div>
+
+                                <!-- Jump 2: Minutes -->
+                                <div class="flex-1 text-center relative px-2">
+                                    <div class="mb-2">
+                                        <span class="inline-flex items-center space-x-1 bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
+                                            <input id="ans-l2-jumpm" data-expected="${data.jumpM}" type="number" class="input-box w-12 px-1 py-0.5 bg-white border border-emerald-300 rounded text-center text-sm">
+                                            <span>min</span>
+                                        </span>
+                                    </div>
+                                    <svg class="w-full h-12" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                        <path d="M 5,35 Q 50,5 95,35" fill="none" stroke="#10B981" stroke-width="3" stroke-dasharray="4,4"/>
+                                        <polygon points="90,30 98,35 92,38" fill="#10B981" />
+                                    </svg>
+                                </div>
+
+                            </div>
+
+                            <!-- Main Timeline Line -->
+                            <div class="h-2 bg-indigo-500 rounded-full my-1 relative z-0 mx-8"></div>
+
+                            <!-- Timeline Ticks & Labels Below -->
+                            <div class="flex justify-between relative z-10 px-4 mt-2">
+                                
+                                <!-- Start Tick -->
+                                <div class="text-center w-28">
+                                    <div class="w-1 h-4 bg-indigo-700 mx-auto -mt-4 mb-2 rounded"></div>
+                                    <div class="bg-indigo-50 border border-indigo-200 px-2 py-1 rounded-xl text-sm font-bold text-indigo-950">
+                                        ${startTimeStr}
+                                    </div>
+                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Start Time</div>
+                                </div>
+
+                                <!-- Mid Tick -->
+                                <div class="text-center w-28">
+                                    <div class="w-1 h-4 bg-indigo-700 mx-auto -mt-4 mb-2 rounded"></div>
+                                    <div class="bg-white border-2 border-indigo-300 px-2 py-1 rounded-xl text-sm font-bold text-indigo-900">
+                                        <input id="ans-l2-midtime" data-expected="${midTimeStr}" type="text" placeholder="e.g. 5:15 pm" class="input-box w-full bg-indigo-50/50 border border-indigo-200 rounded text-center text-xs py-1">
+                                    </div>
+                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Intermediate</div>
+                                </div>
+
+                                <!-- End Tick -->
+                                <div class="text-center w-28">
+                                    <div class="w-1 h-4 bg-indigo-700 mx-auto -mt-4 mb-2 rounded"></div>
+                                    <div class="bg-indigo-50 border border-indigo-200 px-2 py-1 rounded-xl text-sm font-bold text-indigo-950">
+                                        ${sc.target === 'duration' ? endTimeStr : `<input id="ans-l2-endtime" data-expected="${endTimeStr}" type="text" placeholder="End Time" class="input-box w-full bg-white border border-indigo-300 rounded text-center text-xs py-1">`}
+                                    </div>
+                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">End Time</div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Final Statement Fill-in -->
+                    <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex flex-wrap items-center justify-center gap-2 font-display text-lg font-bold text-indigo-950 text-center">
+                        <span>The activity lasted for</span>
+                        <input id="ans-l2-final-h" data-expected="${data.jumpH}" type="number" class="input-box w-16 px-2 py-1 border-2 border-indigo-400 rounded-xl bg-white text-indigo-900">
+                        <span>h</span>
+                        <input id="ans-l2-final-m" data-expected="${data.jumpM}" type="number" class="input-box w-20 px-2 py-1 border-2 border-indigo-400 rounded-xl bg-white text-indigo-900">
+                        <span>min long.</span>
+                    </div>
+
+                </div>
+            `;
+
+            workspace.innerHTML = html;
+        }
+
+        function renderLevel3(data) {
+            const workspace = document.getElementById('workspace');
+            const sc = data.scenario;
+
+            const startTimeStr = formatTimeDisplay(data.startTotal, data.is24h);
+            const mid1TimeStr = formatTimeDisplay(data.mid1Total, data.is24h);
+            const endTimeStr = formatTimeDisplay(data.endTotal, data.is24h);
+
+            document.getElementById('question-prompt').innerText = `${sc.name} finished ${sc.action} at ${endTimeStr}.`;
+            document.getElementById('question-prompt').innerText += ` The total duration was ${data.jumpH} h ${data.jumpM} min. What time did ${sc.name} start?`;
+            document.getElementById('question-subtext').innerText = "Count BACKWARD along the timeline to find the start time!";
+
+            let html = `
+                <div class="w-full space-y-6">
+                    
+                    <!-- SVG Interactive Timeline Component (Counting Backwards) -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-6 border-2 border-slate-200 shadow-inner overflow-x-auto">
+                        <div class="min-w-[550px] relative py-8">
+                            
+                            <!-- Timeline Arcs Container (Right to Left) -->
+                            <div class="flex items-center justify-between relative z-10 px-6">
+                                
+                                <!-- Step 2 Backward: Minutes -->
+                                <div class="flex-1 text-center relative px-2">
+                                    <div class="mb-2">
+                                        <span class="inline-flex items-center space-x-1 bg-rose-100 text-rose-900 border border-rose-300 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
+                                            <span>-</span>
+                                            <input id="ans-l3-jumpm" data-expected="${data.jumpM}" type="number" class="input-box w-12 px-1 py-0.5 bg-white border border-rose-300 rounded text-center text-sm">
+                                            <span>min</span>
+                                        </span>
+                                    </div>
+                                    <!-- Curved Arc going Left -->
+                                    <svg class="w-full h-12" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                        <path d="M 95,35 Q 50,5 5,35" fill="none" stroke="#F43F5E" stroke-width="3" stroke-dasharray="4,4"/>
+                                        <polygon points="10,38 2,35 10,30" fill="#F43F5E" />
+                                    </svg>
+                                </div>
+
+                                <!-- Step 1 Backward: Hours -->
+                                <div class="flex-1 text-center relative px-2">
+                                    <div class="mb-2">
+                                        <span class="inline-flex items-center space-x-1 bg-purple-100 text-purple-900 border border-purple-300 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
+                                            <span>-</span>
+                                            <input id="ans-l3-jumph" data-expected="${data.jumpH}" type="number" class="input-box w-12 px-1 py-0.5 bg-white border border-purple-300 rounded text-center text-sm">
+                                            <span>h</span>
+                                        </span>
+                                    </div>
+                                    <svg class="w-full h-12" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                        <path d="M 95,35 Q 50,5 5,35" fill="none" stroke="#8B5CF6" stroke-width="3" stroke-dasharray="4,4"/>
+                                        <polygon points="10,38 2,35 10,30" fill="#8B5CF6" />
+                                    </svg>
+                                </div>
+
+                            </div>
+
+                            <!-- Main Timeline Line -->
+                            <div class="h-2 bg-rose-500 rounded-full my-1 relative z-0 mx-8"></div>
+
+                            <!-- Timeline Ticks & Labels Below -->
+                            <div class="flex justify-between relative z-10 px-4 mt-2">
+                                
+                                <!-- Start Time Box (Missing to solve) -->
+                                <div class="text-center w-28">
+                                    <div class="w-1 h-4 bg-rose-700 mx-auto -mt-4 mb-2 rounded"></div>
+                                    <div class="bg-rose-50 border-2 border-rose-300 px-2 py-1 rounded-xl text-sm font-bold text-rose-950">
+                                        <input id="ans-l3-starttime" data-expected="${startTimeStr}" type="text" placeholder="Start Time" class="input-box w-full bg-white border border-rose-300 rounded text-center text-xs py-1">
+                                    </div>
+                                    <div class="text-[11px] font-bold text-rose-600 mt-0.5">Start Time</div>
+                                </div>
+
+                                <!-- Intermediate Tick -->
+                                <div class="text-center w-28">
+                                    <div class="w-1 h-4 bg-rose-700 mx-auto -mt-4 mb-2 rounded"></div>
+                                    <div class="bg-white border-2 border-slate-300 px-2 py-1 rounded-xl text-sm font-bold text-slate-800">
+                                        <input id="ans-l3-midtime" data-expected="${mid1TimeStr}" type="text" placeholder="e.g. 22 30" class="input-box w-full bg-slate-50 border border-slate-300 rounded text-center text-xs py-1">
+                                    </div>
+                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Intermediate</div>
+                                </div>
+
+                                <!-- End Time Box -->
+                                <div class="text-center w-28">
+                                    <div class="w-1 h-4 bg-rose-700 mx-auto -mt-4 mb-2 rounded"></div>
+                                    <div class="bg-slate-100 border border-slate-300 px-2 py-1 rounded-xl text-sm font-bold text-slate-700">
+                                        ${endTimeStr}
+                                    </div>
+                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">End Time</div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Final Answer Statement -->
+                    <div class="bg-rose-50 p-4 rounded-2xl border border-rose-100 flex flex-wrap items-center justify-center gap-2 font-display text-lg font-bold text-rose-950 text-center">
+                        <span>${sc.name} started at</span>
+                        <input id="ans-l3-final-time" data-expected="${startTimeStr}" type="text" placeholder="e.g. ${startTimeStr}" class="input-box px-3 py-1 border-2 border-rose-400 rounded-xl bg-white text-rose-900 font-bold">
+                    </div>
+
+                </div>
+            `;
+
+            workspace.innerHTML = html;
+        }
+
+
+        let sandboxTime = 480; // 08:00 AM in minutes
+        let sandboxJumps = [];
+
+        function renderSandbox() {
+            document.getElementById('level-badge').innerText = "Sandbox Mode";
+            document.getElementById('sub-mode-badge').innerText = "Interactive Timeline Tool";
+            document.getElementById('question-prompt').innerText = "Interactive Timeline Builder Scratchpad";
+            document.getElementById('question-subtext').innerText = "Add hour or minute jumps to see how time moves forward or backward on a timeline!";
+
+            const workspace = document.getElementById('workspace');
+
+            let html = `
+                <div class="w-full space-y-6">
+                    
+                    <!-- Control Bar for Sandbox -->
+                    <div class="bg-indigo-50/80 p-4 rounded-2xl border border-indigo-100 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center space-x-2">
+                            <label class="font-bold text-sm text-indigo-900">Start Time:</label>
+                            <input type="time" id="sandbox-start-input" value="08:00" onchange="updateSandboxStart(this.value)" class="px-3 py-1.5 rounded-xl border-2 border-indigo-300 font-bold text-indigo-900 bg-white">
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Add Jumps:</span>
+                            <button onclick="addSandboxJump(60)" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm">+1 h</button>
+                            <button onclick="addSandboxJump(30)" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm">+30 min</button>
+                            <button onclick="addSandboxJump(15)" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm">+15 min</button>
+                            <button onclick="addSandboxJump(-60)" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm">-1 h</button>
+                            <button onclick="addSandboxJump(-30)" class="px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-sm">-30 min</button>
+                            <button onclick="addSandboxJump(-15)" class="px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-sm">-15 min</button>
+                            <button onclick="clearSandbox()" class="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs">Reset</button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Rendered Timeline -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-6 border-2 border-indigo-100 shadow-inner overflow-x-auto min-h-[200px] flex flex-col justify-center">
+                        <div id="sandbox-timeline-content">
+                            <!-- Dynamic steps rendering -->
+                        </div>
+                    </div>
+
+                </div>
+            `;
+
+            workspace.innerHTML = html;
+            renderSandboxTimeline();
+
+            // Hide normal check button in sandbox
+            document.getElementById('check-btn').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function updateSandboxStart(timeVal) {
+            if (!timeVal) return;
+            const [h, m] = timeVal.split(':').map(Number);
+            sandboxTime = h * 60 + m;
+            renderSandboxTimeline();
+        }
+
+        function addSandboxJump(mins) {
+            sandboxJumps.push(mins);
+            renderSandboxTimeline();
+        }
+
+        function clearSandbox() {
+            sandboxJumps = [];
+            renderSandboxTimeline();
+        }
+
+        function renderSandboxTimeline() {
+            const container = document.getElementById('sandbox-timeline-content');
+            if (!container) return;
+
+            let currTime = sandboxTime;
+            let nodes = [currTime];
+
+            sandboxJumps.forEach(j => {
+                currTime += j;
+                nodes.push(currTime);
+            });
+
+            if (nodes.length === 1) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="fa-solid fa-arrow-trend-up text-3xl mb-2 text-indigo-300"></i>
+                        <p class="text-sm font-semibold">Click the buttons above to add hour or minute jumps to your timeline!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="flex items-center space-x-2 overflow-x-auto py-6 px-4">
+            `;
+
+            for (let i = 0; i < nodes.length; i++) {
+                const tStr = formatTimeDisplay(nodes[i], false);
+                const t24Str = formatTimeDisplay(nodes[i], true);
+
+                html += `
+                    <div class="flex flex-col items-center">
+                        <div class="bg-indigo-600 text-white font-bold text-xs sm:text-sm px-3 py-1.5 rounded-xl shadow-md whitespace-nowrap">
+                            ${tStr}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-semibold mt-0.5">${t24Str}</div>
+                        <div class="w-1 h-4 bg-indigo-500 rounded my-1"></div>
+                    </div>
+                `;
+
+                if (i < sandboxJumps.length) {
+                    const j = sandboxJumps[i];
+                    const isPositive = j > 0;
+                    const label = isPositive ? `+${j >= 60 || j <= -60 ? (j/60)+' h' : j+' min'}` : `${j >= 60 || j <= -60 ? (j/60)+' h' : j+' min'}`;
+
+                    html += `
+                        <div class="flex flex-col items-center px-2 min-w-[80px]">
+                            <span class="text-xs font-bold ${isPositive ? 'text-emerald-600' : 'text-rose-600'} bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                                ${label}
+                            </span>
+                            <div class="w-full h-0.5 border-t-2 border-dashed ${isPositive ? 'border-emerald-400' : 'border-rose-400'} my-2"></div>
+                        </div>
+                    `;
+                }
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+
+        function normalizeTimeStr(str) {
+            if (!str) return '';
+            return str.toLowerCase().replace(/\s+/g, '').replace(':', '');
+        }
+
+        function checkAnswer() {
+            const inputs = document.querySelectorAll('#workspace input[data-expected]');
+            if (inputs.length === 0) return;
+
+            let allCorrect = true;
+            let totalInputs = inputs.length;
+            let correctCount = 0;
+
+            inputs.forEach(input => {
+                const rawExpected = input.getAttribute('data-expected');
+                const rawUser = input.value.trim();
+
+                const normExp = normalizeTimeStr(rawExpected);
+                const normUser = normalizeTimeStr(rawUser);
+
+                // Allow small variations (e.g. "0750" vs "07 50" vs "7:50am")
+                if (normUser === normExp || (normExp === '1200am' && normUser === '0000') || (normExp === '0000' && normUser === '1200am')) {
+                    input.classList.remove('input-wrong');
+                    input.classList.add('input-correct');
+                    correctCount++;
+                } else {
+                    input.classList.remove('input-correct');
+                    input.classList.add('input-wrong');
+                    allCorrect = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback-msg');
+
+            if (allCorrect) {
+                playCorrectSound();
+                feedback.innerHTML = `
+                    <span class="text-emerald-600 flex items-center justify-center sm:justify-start space-x-1">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Excellent work! All answers are correct! (+10 Stars)</span>
+                    </span>
+                `;
+                stars += 10;
+                streak += 1;
+                document.getElementById('star-count').innerText = stars;
+                document.getElementById('streak-count').innerText = streak;
+
+                // Show next button
+                document.getElementById('check-btn').classList.add('hidden');
+                document.getElementById('next-btn').classList.remove('hidden');
+            } else {
+                playWrongSound();
+                streak = 0;
+                document.getElementById('streak-count').innerText = streak;
+                feedback.innerHTML = `
+                    <span class="text-rose-600 flex items-center justify-center sm:justify-start space-x-1">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>Some answers need fixing (${correctCount}/${totalInputs} correct). Try again!</span>
+                    </span>
+                `;
+            }
+        }
+
+        function switchLevel(lvl) {
+            currentLevel = lvl;
+
+            // Update tab styles
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`tab-lvl-${i}`);
+                if (i === lvl) {
+                    btn.className = "tab-btn px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-200 flex flex-col items-center justify-center border-2 border-indigo-600 bg-indigo-600 text-white shadow-lg shadow-indigo-200";
+                } else {
+                    btn.className = "tab-btn px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all duration-200 flex flex-col items-center justify-center border-2 border-slate-200 bg-white text-slate-600 hover:border-indigo-300";
+                }
+            }
+
+            // Hide hint modal if open
+            document.getElementById('hint-box').classList.add('hidden');
+
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            // Reset feedback and buttons
+            document.getElementById('feedback-msg').innerHTML = '';
+            document.getElementById('check-btn').classList.remove('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            const lvlBadge = document.getElementById('level-badge');
+            const subBadge = document.getElementById('sub-mode-badge');
+
+            if (currentLevel === 1) {
+                currentData = generateLevel1Data();
+                lvlBadge.innerText = "Level 1: Conversions";
+                if (currentSubMode === 'clock') subBadge.innerText = "12-h <-> 24-h Clock";
+                else if (currentSubMode === 'hours_to_min') subBadge.innerText = "Hours & Min -> Minutes";
+                else subBadge.innerText = "Minutes -> Hours & Min";
+
+                renderLevel1(currentData);
+            } else if (currentLevel === 2) {
+                currentData = generateLevel2Data();
+                lvlBadge.innerText = "Level 2: Forward Timeline";
+                subBadge.innerText = currentData.target === 'duration' ? 'Find Duration' : 'Find End Time';
+                renderLevel2(currentData);
+            } else if (currentLevel === 3) {
+                currentData = generateLevel3Data();
+                lvlBadge.innerText = "Level 3: Backward Timeline";
+                subBadge.innerText = "Find Start Time";
+                renderLevel3(currentData);
+            } else if (currentLevel === 4) {
+                renderSandbox();
+            }
+        }
+
+        function showHint() {
+            const hintBox = document.getElementById('hint-box');
+            const hintText = document.getElementById('hint-text');
+
+            if (currentLevel === 1) {
+                if (currentSubMode === 'clock') {
+                    hintText.innerText = "To change 12-hour (PM) to 24-hour, add 12 to hours (e.g., 4:05 pm -> 16 05). For AM, add leading zero (e.g., 7:50 am -> 07 50). Note: 12:00 am = 00 00.";
+                } else if (currentSubMode === 'hours_to_min') {
+                    hintText.innerText = "Remember: 1 hour = 60 minutes. First convert hours to minutes, then add the remaining minutes!";
+                } else {
+                    hintText.innerText = "Subtract groups of 60 minutes. Each 60 minutes gives you 1 hour!";
+                }
+            } else if (currentLevel === 2) {
+                hintText.innerText = "Jump forward step-by-step! First add the full hours to get an intermediate time, then add the remaining minutes.";
+            } else if (currentLevel === 3) {
+                hintText.innerText = "Work BACKWARD from the end time! First subtract the full hours, then subtract the minutes from the intermediate time.";
+            } else {
+                hintText.innerText = "Use the buttons to explore how adding or subtracting time changes the clock!";
+            }
+
+            hintBox.classList.toggle('hidden');
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            generateQuestion();
+        };
+    </script>
+</body>
+</html>
